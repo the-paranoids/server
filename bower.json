@@ -1,0 +1,21 @@
+{
+  "name": "server",
+  "description": "DynaKey demo server",
+  "main": "index.js",
+  "authors": [
+    "cyberbeast"
+  ],
+  "license": "BSD-2-Clause",
+  "moduleType": [],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.2"
+  }
+}

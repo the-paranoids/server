@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+		<title>HOME | DynaKey this</title>
+		<link rel="shortcut icon" href="../favicon.ico">
+		<link rel="stylesheet" type="text/css" href="css/normalize.css" />
+		<link rel="stylesheet" type="text/css" href="css/demo.css" />
+		<link rel="stylesheet" type="text/css" href="css/component.css" />
+		<script src="js/modernizr.custom.js"></script>
+	</head>
+	<body class="color-4">
+		<div class="container">
+			<section class="color-4">
+				<nav class="cl-effect-2">
+					<a href="#"><span data-hover="Register">New User</span></a>
+					<a href="#"><span data-hover="Detection">Identification</span></a>
+					<a href="/dfa"><span data-hover="Login">Dual Factor Authentication</span></a>
+					<a href="#"><span data-hover="Login">OAuth + DynaKey</span></a>
+				</nav>
+			</section>
+		</div><!-- /container -->
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>  
+    var socket = io.connect('http://localhost:4200');
+    socket.on('connect', function(data) {
+        socket.emit('join', 'Hello World from client');
+    });
+	</script>
+	</body>
+</html>
