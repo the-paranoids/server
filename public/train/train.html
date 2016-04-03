@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+		<title>HOME | DynaKey this</title>
+		<link rel="shortcut icon" href="../favicon.ico">
+		<link rel="stylesheet" type="text/css" href="css/normalize.css" />
+		<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.2.0/css/font-awesome.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/demo.css" />
+		<link rel="stylesheet" type="text/css" href="css/set2.css" />
+		<!--[if IE]>
+  		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+	</head>
+<body class="color-4">
+	<center><h1>Train</h1></center>
+	<center>
+			<section class="content bgcolor-4">
+				<span class="input input--kozakura">
+					<input class="input__field input__field--kozakura" type="text" id="input-7" />
+					<label class="input__label input__label--kozakura" for="input-7">
+						<span class="input__label-content input__label-content--kozakura" data-content="Username">Username</span>
+					</label>
+					<svg class="graphic graphic--kozakura" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
+						<path d="M1200,9c0,0-305.005,0-401.001,0C733,9,675.327,4.969,598,4.969C514.994,4.969,449.336,9,400.333,9C299.666,9,0,9,0,9v43c0,0,299.666,0,400.333,0c49.002,0,114.66,3.484,197.667,3.484c77.327,0,135-3.484,200.999-3.484C894.995,52,1200,52,1200,52V9z"/>
+					</svg>
+				</span>
+				<span class="input input--kozakura">
+					<input class="input__field input__field--kozakura" type="text" id="input-8" />
+					<label class="input__label input__label--kozakura" for="input-8">
+						<span class="input__label-content input__label-content--kozakura" data-content="Password">Password</span>
+					</label>
+					<svg class="graphic graphic--kozakura" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
+						<path d="M1200,9c0,0-305.005,0-401.001,0C733,9,675.327,4.969,598,4.969C514.994,4.969,449.336,9,400.333,9C299.666,9,0,9,0,9v43c0,0,299.666,0,400.333,0c49.002,0,114.66,3.484,197.667,3.484c77.327,0,135-3.484,200.999-3.484C894.995,52,1200,52,1200,52V9z"/>
+					</svg>
+				</span>
+			</section>
+			<div id="future"></div>
+			</center>
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>  
+    var socket = io.connect('http://localhost:4200');
+    socket.on('connect', function(data) {
+        socket.emit('join', 'Hello World from client - train');
+    });
+
+    function Keystroke(keyCode, timeDown, timeUp) {
+    this.keyCode = keyCode;
+    this.timeDown = timeDown;
+    this.timeUp = timeUp;
+}
+var initial_data = new Array();
+var start_time, end_time,index, diff,total,all;
+// total = ''
+// all = ''
+$(document).ready(function(){  
+    // $("#input").val("");
+
+    $("#input-8").keydown(function(event) {
+    		console.log("HERE");
+            if(event.keyCode == 8)
+            {
+             initial_data.pop();
+             if(initial_data == undefined)
+                 initial_data = new Array();
+            }
+           else{
+           // $("#start").text( event.timeStamp + '  ' + event.keyCode);
+           start_time = event.timeStamp;
+           index = initial_data.length;
+            initial_data[index] = new Keystroke( event.keyCode, event.timeStamp, 0 );
+        }
+        // $("#textentered").text($("input").val());
+        if(event.keyCode == 13){
+
+                 var password = $("#input-8").val();
+                 var hold_time =new Array();
+                 var DDtime = new Array();
+                 var UDtime = new Array();
+                 var Final_List = new Array();
+                 var i;
+                 for(i=0; i<initial_data.length-1;i++)
+                 {
+                    hold_time[i] = initial_data[i].timeUp - initial_data[i].timeDown;
+                    UDtime[i] = initial_data[i+1].timeDown - initial_data[i].timeUp;
+                    DDtime[i] = hold_time[i]  + UDtime[i];
+                    Final_List[i*3] = hold_time[i];
+                    Final_List[i*3 + 1] = UDtime[i];
+                    Final_List[i*3 + 2] = DDtime[i];
+                 }
+                 var json_structure = {
+                    'text':password,
+                    'signature':Final_List
+                 }
+
+                 console.log(json_structure['signature']);
+                 // var temp = json_structure;
+                 // $("#start").text(temp['text']);
+
+                 // server sending business happens below
+                var username = $("#input-7").val();
+                // var password = $("##input-8").val();
+                console.log("UName: " + username);
+                socket.emit('train_req', {
+                	'username':username,
+                    'text':password,
+                    'signature':Final_List
+                 });
+                console.log("Emitted");
+
+            }
+    });
+
+     $("#input-8").keyup(function(event) {
+         if(event.keyCode != 8)
+        {
+           // $("#end").text( event.timeStamp + '  ' + event.keyCode);
+           end_time = event.timeStamp;
+           var current,i;
+           for( i = initial_data.length-1; i>=0; i--)
+           {
+             if( initial_data[i].keyCode == event.keyCode && initial_data[i].timeUp == 0) {
+                initial_data[i].timeUp = event.timeStamp;
+                break;
+             }
+           }
+          //  $("#continuous").text( initial_data[i].timeUp - initial_data[i].timeDown);
+          // total = total + ' '+ String(initial_data[i].timeUp - initial_data[i].timeDown);
+          // $("#previous").text( total );
+          //  all = all + ' '+ String(event.keyCode);
+          //   $("#alphacode").html(all);
+
+          }
+    });
+
+     socket.on('train_resp', function(info){
+              $('#future').html(info);
+            });
+
+ });
+	</script>
+
+
+</body>
+</html>

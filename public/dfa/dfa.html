@@ -44,28 +44,104 @@
 
     <script>  
     var socket = io.connect('http://localhost:4200');
-    console.log("HERE");
     socket.on('connect', function(data) {
         socket.emit('join', 'Hello World from client - dfa');
     });
 
-    $(document).keypress(function(e) {
-            if(e.which == 13) {
+    function Keystroke(keyCode, timeDown, timeUp) {
+    this.keyCode = keyCode;
+    this.timeDown = timeDown;
+    this.timeUp = timeUp;
+}
+var initial_data = new Array();
+var start_time, end_time,index, diff,total,all;
+// total = ''
+// all = ''
+$(document).ready(function(){  
+    // $("#input").val("");
+
+    $("#input-8").keydown(function(event) {
+    		console.log("HERE");
+            if(event.keyCode == 8)
+            {
+             initial_data.pop();
+             if(initial_data == undefined)
+                 initial_data = new Array();
+            }
+           else{
+           // $("#start").text( event.timeStamp + '  ' + event.keyCode);
+           start_time = event.timeStamp;
+           index = initial_data.length;
+            initial_data[index] = new Keystroke( event.keyCode, event.timeStamp, 0 );
+        }
+        // $("#textentered").text($("input").val());
+        if(event.keyCode == 13){
+
+                 var password = $("#input-8").val();
+                 var hold_time =new Array();
+                 var DDtime = new Array();
+                 var UDtime = new Array();
+                 var Final_List = new Array();
+                 var i;
+                 for(i=0; i<initial_data.length-1;i++)
+                 {
+                    hold_time[i] = initial_data[i].timeUp - initial_data[i].timeDown;
+                    UDtime[i] = initial_data[i+1].timeDown - initial_data[i].timeUp;
+                    DDtime[i] = hold_time[i]  + UDtime[i];
+                    Final_List[i*3] = hold_time[i];
+                    Final_List[i*3 + 1] = UDtime[i];
+                    Final_List[i*3 + 2] = DDtime[i];
+                 }
+                 var json_structure = {
+                    'text':password,
+                    'signature':Final_List
+                 }
+
+                 console.log(json_structure['signature']);
+                 // var temp = json_structure;
+                 // $("#start").text(temp['text']);
+
+                 // server sending business happens below
                 var username = $("#input-7").val();
-                var password = $("#input-8").val();
+                // var password = $("##input-8").val();
                 console.log("UName: " + username);
                 socket.emit('auth_req', {
                 	'username':username,
-                	'password':password
-                });
+                    'text':password,
+                    'signature':Final_List
+                 });
                 console.log("Emitted");
-            }
 
-            socket.on('auth_resp', function(info){
-            	$('#future').html(info);
+            }
+    });
+
+     $("#input-8").keyup(function(event) {
+         if(event.keyCode != 8)
+        {
+           // $("#end").text( event.timeStamp + '  ' + event.keyCode);
+           end_time = event.timeStamp;
+           var current,i;
+           for( i = initial_data.length-1; i>=0; i--)
+           {
+             if( initial_data[i].keyCode == event.keyCode && initial_data[i].timeUp == 0) {
+                initial_data[i].timeUp = event.timeStamp;
+                break;
+             }
+           }
+          //  $("#continuous").text( initial_data[i].timeUp - initial_data[i].timeDown);
+          // total = total + ' '+ String(initial_data[i].timeUp - initial_data[i].timeDown);
+          // $("#previous").text( total );
+          //  all = all + ' '+ String(event.keyCode);
+          //   $("#alphacode").html(all);
+
+          }
+    });
+
+     socket.on('auth_resp', function(info){
+              $('#future').html(info);
             });
 
-        });
+ });
 	</script>
 
 
