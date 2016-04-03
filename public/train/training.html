@@ -1,0 +1,56 @@
+<html>  
+<head>  
+
+</head>  
+<body>  
+User Name : <input type="text" id="UName"><br>
+Password: <input type="text" id="Pwd">   
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script> 
+<script>  
+function Keystroke(keyCode, keyAction, time) {
+    this.keyCode = keyCode;
+    this.keyAction = keyAction;
+    this.time = time;
+}
+var initial_data = new Array();
+var index;
+$(document).ready(function(){  
+    $("#Pwd").val("");        //Clearing the input field
+    $("#Pwd").keydown(function(event){
+            if(event.keyCode == 8)   // Backspace
+            {
+             initial_data.pop();            //Removing previous element
+             if(initial_data == undefined){
+
+                 initial_data = new Array();
+             }
+            }
+           else {//if(event.keyCode != 32 && event.keyCode!=13){
+           index = initial_data.length;
+            initial_data[index] = new Keystroke( event.keyCode, 0,event.timeStamp );
+        }
+
+        if(event.keyCode == 32){
+            $("#Pwd").val("");
+            }
+
+        if(event.keyCode == 13){
+            var Uname = $("#UName").text();
+            var password = $("#Pwd").text();
+             var json_structure = {
+                'UName':Uname,
+                'Pwd' :password,
+                'signature':initial_data
+                 }
+            }
+    });
+
+     $("#Pwd").keyup(function(event) {
+            index = initial_data.length;
+            initial_data[index] = new Keystroke( event.keyCode, 1, event.timeStamp );
+    });
+
+});    
+</script>    
+</body>  
+</html>
